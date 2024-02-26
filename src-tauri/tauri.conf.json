@@ -7,7 +7,7 @@
   },
   "package": {
     "productName": "Summaread",
-    "version": "0.0.1-voicevox"
+    "version": "0.0.2"
   },
   "tauri": {
     "allowlist": {
