@@ -82,30 +82,19 @@ export function App() {
     setIsSummarizing(false);
   };
 
-  const [ttsHost, setTtsHost] = useLocalStorage("tts_host", "");
-  const [masterControl, setMasterControl] = useLocalStorage(
-    "master_control",
-    `{
-  "Volume": 1.0,
-  "Speed": 1.0,
-  "Pitch": 1.0,
-  "PitchRange": 1.0,
-  "MiddlePause": 150,
-  "LongPause": 370,
-  "SentencePause": 800
-}`
-  );
+  const ttsHost = "http://localhost:50021";
+  const [speakerId, setSpeakerId] = useLocalStorage("speaker_id", "0");
 
   useEffect(() => {
     (async () => {
-      await fetch(`${ttsHost}/host/0`, { method: "POST" });
+      /* await fetch(`${ttsHost}/host/0`, { method: "POST" });
       await fetch(`${ttsHost}/voice-preset/0`, { method: "POST" });
       await fetch(`${ttsHost}/master-control`, {
         method: "POST",
         body: masterControl,
-      });
+      }); */
     })();
-  }, [ttsHost, masterControl]);
+  }, [ttsHost, speakerId]);
 
   const startTts = async () => {
     if (!summarizedPapers) return;
@@ -130,11 +119,36 @@ export function App() {
   const stopTts = useRef(() => {});
   const isTtsStopped = useRef(false);
 
+  const [speed, setSpeed] = useLocalStorage("speed", 1);
+  const [pitch, setPitch] = useLocalStorage("pitch", 0);
+  const [intonation, setIntonation] = useLocalStorage("intonation", 1);
+
   const tts = async (text: string) => {
-    const blob = await fetch(`${ttsHost}/synthesis`, {
-      method: "POST",
-      body: JSON.stringify({ Text: text }),
-    }).then((res) => res.blob());
+    const audioQuery = await fetch(
+      `${ttsHost}/audio_query?${new URLSearchParams({
+        text: text,
+        speaker: speakerId ?? "0",
+      })}`,
+      {
+        method: "POST",
+      }
+    ).then((res) => res.json());
+    audioQuery.speedScale = speed;
+    audioQuery.pitchScale = pitch;
+    audioQuery.intonationScale = intonation;
+
+    const blob = await fetch(
+      `${ttsHost}/synthesis?${new URLSearchParams({
+        speaker: speakerId ?? "0",
+      })}`,
+      {
+        method: "POST",
+        body: JSON.stringify(audioQuery),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    ).then((res) => res.blob());
     const blobUrl = URL.createObjectURL(blob);
     const audio = new Audio(blobUrl);
     stopTts.current = () => {
@@ -249,16 +263,28 @@ export function App() {
               onChange={(e) => setPrompt(e.target.value)}
             />
             <TextField
-              label="TTS Host"
-              value={ttsHost}
-              onChange={(e) => setTtsHost(e.target.value)}
+              label="Speaker ID"
+              value={speakerId}
+              type="number"
+              onChange={(e) => setSpeakerId(e.target.value)}
             />
             <TextField
-              label="Master Control"
-              multiline
-              rows={8}
-              value={masterControl}
-              onChange={(e) => setMasterControl(e.target.value)}
+              label="Speed"
+              value={speed}
+              type="number"
+              onChange={(e) => setSpeed(parseFloat(e.target.value))}
+            />
+            <TextField
+              label="Pitch"
+              value={pitch}
+              type="number"
+              onChange={(e) => setPitch(parseFloat(e.target.value))}
+            />
+            <TextField
+              label="Intonation"
+              value={intonation}
+              type="number"
+              onChange={(e) => setIntonation(parseFloat(e.target.value))}
             />
             <Stack direction="row" spacing={1}>
               <Button
