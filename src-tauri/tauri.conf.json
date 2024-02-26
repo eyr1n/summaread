@@ -6,7 +6,7 @@
     "distDir": "../dist"
   },
   "package": {
-    "productName": "summaread",
+    "productName": "Summaread",
     "version": "0.0.0"
   },
   "tauri": {
