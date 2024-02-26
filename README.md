@@ -1,7 +1,13 @@
-# Tauri + React + Typescript
+# Summaread
 
-This template should help get you started developing with Tauri, React and Typescript in Vite.
+## 使い方
 
-## Recommended IDE Setup
+- 画面右下の設定ボタンを押して OpenAI の API トークンを記載する
+  ![Alt text](img/apikey.png)
+- TTS Host の欄に「AiVoiceHttpApi(現在非公開)」の URL を入力
+- URL から PDF を読ませたり，Open ボタンから PDF を開いて要約してもらったら，TTS ボタンで A.I.VOICE による音声合成を行うことができる
 
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+## 注意
+
+- Windows だと 1 台の PC で完結するが，macOS の場合は同一 LAN 内に Windows PC を用意する必要あり
+- OpenAI の API の課金額に気をつける
